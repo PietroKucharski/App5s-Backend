@@ -1,0 +1,76 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Checklist {
+  id        Int                 @id @default(autoincrement())
+  name      String              @db.VarChar(250)
+  createdAt DateTime            @default(now()) @db.DateTime(0)
+  updatedAt DateTime            @default(now()) @db.DateTime(0)
+  questions ChecklistQuestion[]
+
+  @@map("checklists")
+}
+
+model ChecklistQuestion {
+  questions   Question  @relation(fields: [questionId], references: [id])
+  questionId  Int
+  checklists  Checklist @relation(fields: [checklistId], references: [id])
+  checklistId Int
+  createdAt   DateTime  @default(now()) @db.DateTime(0)
+  updatedAt   DateTime  @default(now()) @db.DateTime(0)
+
+  @@id([questionId, checklistId])
+  @@map("checklistsquestions")
+}
+
+model Question {
+  id         Int                 @id @default(autoincrement())
+  question   String              @db.VarChar(500)
+  createdAt  DateTime            @default(now()) @db.DateTime(0)
+  updatedAt  DateTime            @default(now()) @db.DateTime(0)
+  checklists ChecklistQuestion[]
+
+  @@map("questions")
+}
+
+model Area {
+  id          Int        @id @default(autoincrement())
+  description String     @db.VarChar(250)
+  createdAt   DateTime   @default(now()) @db.DateTime(0)
+  updatedAt   DateTime   @default(now()) @db.DateTime(0)
+  users       UserArea[]
+
+  @@map("areas")
+}
+
+model UserArea {
+  areas     Area     @relation(fields: [areaId], references: [id])
+  areaId    Int
+  users     User     @relation(fields: [userId], references: [id])
+  userId    Int
+  createdAt DateTime @default(now()) @db.DateTime(0)
+  updatedAt DateTime @default(now()) @db.DateTime(0)
+
+  @@id([areaId, userId])
+  @@map("usersareas")
+}
+
+model User {
+  id         Int        @id @default(autoincrement())
+  name       String     @db.VarChar(250)
+  email      String     @unique(map: "email_UNIQUE") @db.VarChar(250)
+  password   String     @db.VarChar(250)
+  role       Int        @default(1)
+  role_types Int        @default(1)
+  areas      UserArea[]
+  createdAt  DateTime   @default(now()) @db.DateTime(0)
+  updatedAt  DateTime   @default(now()) @db.DateTime(0)
+
+  @@map("users")
+}
