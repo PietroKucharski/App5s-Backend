@@ -8,8 +8,8 @@ import { Body, Controller, Get, Patch, Post, UseGuards, Delete } from "@nestjs/c
 import { Role } from '../enums/role.enum';
 import { Roles } from '../decorators/roles.decorator';
 
-// @Roles(Role.ADMIN)
-// @UseGuards(AuthGuard, RoleGuard)
+@Roles(Role.ADMIN)
+@UseGuards(AuthGuard, RoleGuard)
 @Controller('users')
 export class UserController {
 

@@ -73,7 +73,14 @@ export class AuthService {
             throw new NotFoundException('Email e/ou senha incorretos');
         }
 
-        return this.createToke(user);
+        const token = this.createToke(user);
+        const checktoken = this.checkToken(token.accessToken)
+        const userData = await this.userService.readOne(checktoken.id)
+        return {
+            token,
+            userData
+        }
+        // return this.userService.readOne(checktoken.id)
     }
 
     async forget(email: string) {
@@ -106,6 +113,12 @@ export class AuthService {
     }
 
     async register(data: AuthRegisterDTO) {
+        const user = await this.userService.create(data);
+
+        return this.createToke(user);
+    }
+
+    async me(data: AuthRegisterDTO) {
         const user = await this.userService.create(data);
 
         return this.createToke(user);

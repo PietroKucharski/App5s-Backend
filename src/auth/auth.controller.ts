@@ -1,3 +1,5 @@
+import { ExecutionContext } from '@nestjs/common';
+import { UserService } from './../user/user.service';
 import { AuthGuard } from './../guards/auth.guard';
 import { AuthResetDTO } from './dtos/auth-reset.dto';
 import { AuthForgetDTO } from './dtos/auth-forget.dto';
@@ -13,12 +15,15 @@ import { User } from '../decorators/user.decorator';
 export class AuthController {
 
     constructor(
-        private authService: AuthService
+        private authService: AuthService,
+        private userService: UserService,
     ) {}
     
     @Post('login')
     async login(@Body() {email, password}: AuthLoginDTO) {
-        return this.authService.login(email, password);
+        const teste = await this.authService.login(email, password);
+        console.log(teste)
+        return teste
     }
 
     @Post('register')
