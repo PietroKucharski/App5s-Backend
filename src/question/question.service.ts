@@ -17,6 +17,7 @@ export class QuestionService {
 
     async read() {
         return this.prisma.question.findMany();
+
     }
 
     async readOne(id: number) {

@@ -76,6 +76,7 @@ export class AuthService {
         const token = this.createToke(user);
         const checktoken = this.checkToken(token.accessToken)
         const userData = await this.userService.readOne(checktoken.id)
+        
         return {
             token,
             userData

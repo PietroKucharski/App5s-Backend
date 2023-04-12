@@ -6,10 +6,14 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 export class ChecklistQuestionService {
     constructor(private prisma: PrismaService) {}
 
-    async create(data: CreateChecklistQuestionDTO) {
-        return this.prisma.checklistQuestion.createMany({
-            data
+    async create({checklistId, questionId}: CreateChecklistQuestionDTO) {
+        return this.prisma.checklistQuestion.create({
+            data: {
+                checklistId,
+                questionId
+            }
         });
+        
     }
 
 
@@ -29,7 +33,7 @@ export class ChecklistQuestionService {
             where: {
                 checklistId
             }, include: {
-                questions: true,
+                questions: true
             }
         })
     }

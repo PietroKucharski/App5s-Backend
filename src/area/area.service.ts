@@ -7,10 +7,19 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 export class AreaService {
     constructor(private prisma: PrismaService) {}
 
-        async create({description}: CreateAreaDTO) {
+    async create({name, id}: CreateAreaDTO) {
+        if(await this.prisma.area.count({
+            where: {
+                name: name,
+                id: id
+            }
+        })) {
+
+        }
         return await this.prisma.area.create({
             data: {
-                description
+                name,
+                id
             }
         })
     }
@@ -29,13 +38,13 @@ export class AreaService {
         });
     }
 
-    async update(id: number, {description}: UpdateAreaDTO) {
+    async update(id: number, {name}: UpdateAreaDTO) {
         await this.exists(id);
 
         const data: any = {}
 
-        if(description) {
-            data.description = description
+        if(name) {
+            data.description = name
         }
 
         return this.prisma.area.update({
@@ -59,7 +68,7 @@ export class AreaService {
     async exists(id: number) {
         if(!(await this.prisma.area.count({
             where: {
-               id 
+            id 
             }
         }))) {
             throw new NotFoundException(`O usuário ${id} não existe`)

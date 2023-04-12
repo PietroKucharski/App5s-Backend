@@ -1,7 +1,7 @@
 import { UpdatePatchUserDTO } from './dtos/update-patch-user.dto';
 import { PrismaService } from './../prisma/prisma.service';
 import { CreateUserDTO } from './dtos/create-user.dto';
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
 import * as bcrypt from 'bcrypt'
 
 @Injectable()
@@ -10,6 +10,14 @@ export class UserService {
     constructor(private prisma: PrismaService) {}
 
     async create(data: CreateUserDTO) {
+        if(await this.prisma.user.count({
+            where: {
+                email: data.email,
+            }
+        })) {
+            throw new BadRequestException('Este email já está sendo utilizado');
+        }
+        
         const salt = await bcrypt.genSalt();
         data.password = await bcrypt.hash(data.password, salt);
 
@@ -33,7 +41,7 @@ export class UserService {
         });
     }
 
-    async update(id: number, {email, name, password, role}: UpdatePatchUserDTO) {
+    async update(id: number, {email, name, password, role, areaId, ativo}: UpdatePatchUserDTO) {
 
         await this.exists(id);
 
@@ -54,6 +62,14 @@ export class UserService {
 
         if(role) {
             data.role = role;
+        }
+
+        if(areaId) {
+            data.areaId = areaId;
+        }
+
+        if(ativo) {
+            data.ativo = ativo;
         }
 
         return this.prisma.user.update({

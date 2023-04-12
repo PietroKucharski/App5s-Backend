@@ -15,14 +15,15 @@ export class ChecklistController {
 
     constructor(private checklistService: ChecklistService) {}
 
-    @Post()
+    @Post() 
     async create(@Body() data: CreateChecklistDTO) {
         return this.checklistService.create(data);
     }
 
     @Get() 
     async read() {
-        return this.checklistService.read();
+        const response = await this.checklistService.read();
+        return response
     }
 
     @Get(':id')

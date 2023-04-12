@@ -23,7 +23,8 @@ export class QuestionController {
 
     @Get()
     async read() {
-        return this.questionService.read();
+        const response = await this.questionService.read();
+        return response
     }
 
     @Get(':id')

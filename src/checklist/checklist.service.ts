@@ -10,8 +10,6 @@ export class ChecklistService {
         return this.prisma.checklist.create({
             data: {
                 name
-            }, include: {
-                questions: false
             }
         });
     }

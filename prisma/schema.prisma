@@ -7,6 +7,70 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Area {
+  id        Int      @unique(map: "id_UNIQUE")
+  name      String   @db.VarChar(30)
+  createdAt DateTime @default(now()) @db.DateTime(0)
+  updatedAt DateTime @default(now()) @db.DateTime(0)
+  users     User[]
+
+  @@map("areas")
+}
+
+model User {
+  id         Int          @id @default(autoincrement())
+  areaId     Int
+  ativo      Int          @db.TinyInt
+  name       String       @db.VarChar(250)
+  email      String       @unique(map: "email_UNIQUE") @db.VarChar(250)
+  password   String       @db.VarChar(250)
+  role       Int          @default(1)
+  role_types Int          @default(1)
+  createdAt  DateTime     @default(now()) @db.DateTime(0)
+  updatedAt  DateTime     @default(now()) @db.DateTime(0)
+  menususers menususers[] @ignore
+  areas      Area         @relation(fields: [areaId], references: [id])
+
+  @@index([areaId], map: "areasId_idx")
+  @@map("users")
+}
+
+model menus {
+  id         Int          @id @default(autoincrement())
+  name       String       @db.VarChar(250)
+  menususers menususers[] @ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model menususers {
+  userId    Int
+  menuId    Int
+  createdAt DateTime @default(now()) @db.DateTime(0)
+  updatedAt DateTime @default(now()) @db.DateTime(0)
+  menus     menus    @relation(fields: [menuId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "menusId")
+  users     User     @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "usersId")
+
+  @@index([menuId], map: "menusId_idx")
+  @@index([userId], map: "usersId_idx")
+  @@ignore
+}
+
+model Audit {
+  id                  Int               @id @default(autoincrement())
+  checklistId         Int
+  questionId          Int
+  accept              Int               @db.TinyInt
+  reject              Int               @db.TinyInt
+  partial             Int               @db.TinyInt
+  createdAt           DateTime          @default(now()) @db.DateTime(0)
+  updatedAt           DateTime          @default(now()) @db.DateTime(0)
+  checklistsquestions ChecklistQuestion @relation(fields: [checklistId, questionId], references: [checklistId, questionId])
+
+  @@index([checklistId], map: "checklistQuestion_idx")
+  @@index([questionId], map: "questionsId_idx")
+  @@map("audits")
+}
+
 model Checklist {
   id        Int                 @id @default(autoincrement())
   name      String              @db.VarChar(250)
@@ -21,9 +85,10 @@ model ChecklistQuestion {
   questions   Question  @relation(fields: [questionId], references: [id])
   questionId  Int
   checklists  Checklist @relation(fields: [checklistId], references: [id])
-  checklistId Int
+  checklistId Int       @unique
   createdAt   DateTime  @default(now()) @db.DateTime(0)
   updatedAt   DateTime  @default(now()) @db.DateTime(0)
+  Audit       Audit[]
 
   @@id([questionId, checklistId])
   @@map("checklistsquestions")
@@ -37,40 +102,4 @@ model Question {
   checklists ChecklistQuestion[]
 
   @@map("questions")
-}
-
-model Area {
-  id          Int        @id @default(autoincrement())
-  description String     @db.VarChar(250)
-  createdAt   DateTime   @default(now()) @db.DateTime(0)
-  updatedAt   DateTime   @default(now()) @db.DateTime(0)
-  users       UserArea[]
-
-  @@map("areas")
-}
-
-model UserArea {
-  areas     Area     @relation(fields: [areaId], references: [id])
-  areaId    Int
-  users     User     @relation(fields: [userId], references: [id])
-  userId    Int
-  createdAt DateTime @default(now()) @db.DateTime(0)
-  updatedAt DateTime @default(now()) @db.DateTime(0)
-
-  @@id([areaId, userId])
-  @@map("usersareas")
-}
-
-model User {
-  id         Int        @id @default(autoincrement())
-  name       String     @db.VarChar(250)
-  email      String     @unique(map: "email_UNIQUE") @db.VarChar(250)
-  password   String     @db.VarChar(250)
-  role       Int        @default(1)
-  role_types Int        @default(1)
-  areas      UserArea[]
-  createdAt  DateTime   @default(now()) @db.DateTime(0)
-  updatedAt  DateTime   @default(now()) @db.DateTime(0)
-
-  @@map("users")
 }

@@ -39,4 +39,5 @@ export class ChecklistQuestionController {
     async delete(@ParamId() id: number) {
         return this.checklistQuestionService.delete(id)
     }
+    
 }
